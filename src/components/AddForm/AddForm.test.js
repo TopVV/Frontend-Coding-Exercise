@@ -1,12 +1,10 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { useForm } from "react-hook-form";
 import { useStore } from "@/store";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { AddForm } from "./AddForm";
 import { APP_ROUTES } from "@/global/const/routes";
 
-// Mocking useRouter and useStore
-jest.mock("next/router", () => ({
+jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 jest.mock("@/store", () => ({

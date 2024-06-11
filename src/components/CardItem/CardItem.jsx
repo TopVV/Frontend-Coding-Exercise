@@ -1,9 +1,9 @@
 import {
-  ChevronDownIcon,
   MinusIcon,
-  ChevronUpIcon,
   DeleteIcon,
   CheckIcon,
+  TriangleDownIcon,
+  TriangleUpIcon,
 } from "@chakra-ui/icons";
 import {
   Card,
@@ -25,26 +25,11 @@ export const CardItem = ({ title, severity, id, description, completed }) => {
   const severityIndicator = useMemo(() => {
     switch (severity) {
       case 0:
-        return {
-          icon: <ChevronDownIcon />,
-          color: "gray.400",
-        };
+        return <TriangleDownIcon boxSize="14px" />;
       case 1:
-        return {
-          icon: "-",
-          color: "yellow.400",
-        };
-
+        return <MinusIcon boxSize="14px" />;
       case 2:
-        return {
-          icon: <ChevronUpIcon />,
-          color: "red.400",
-        };
-      default:
-        return {
-          icon: <MinusIcon />,
-          color: "gray.500",
-        };
+        return <TriangleUpIcon boxSize="14px" />;
     }
   }, [severity]);
 
@@ -78,21 +63,19 @@ export const CardItem = ({ title, severity, id, description, completed }) => {
         }}
       >
         <CardHeader display="flex" justifyContent="space-between">
-          <Heading size="md" sx={sharedTextStyles}>
+          <Heading
+            size="md"
+            sx={sharedTextStyles}
+            data-testid="card-item-heading"
+          >
             {title}
           </Heading>
-          <Center
-            width={5}
-            height={5}
-            flexShrink={0}
-            borderRadius="50%"
-            backgroundColor={severityIndicator.color}
-          >
-            {severityIndicator.icon}
-          </Center>
+          {severityIndicator}
         </CardHeader>
         <CardBody>
-          <Text sx={sharedTextStyles}>{description}</Text>
+          <Text sx={sharedTextStyles} data-testid="card-item-description">
+            {description}
+          </Text>
         </CardBody>
         <CardFooter
           display="flex"
@@ -116,6 +99,7 @@ export const CardItem = ({ title, severity, id, description, completed }) => {
                   }
             }
             aria-label="mark as completed"
+            data-testid="toggleCompleteButton"
           />
           <IconButton
             icon={<DeleteIcon />}
