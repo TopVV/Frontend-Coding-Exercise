@@ -1,95 +1,97 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import {
+  Box,
+  Flex,
+  SimpleGrid,
+  HStack,
+  VStack,
+  Text,
+  Button,
+} from "@chakra-ui/react";
+import { useStore } from "@/store";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import {
+  glassEffectStyles,
+  gradientAnimation,
+} from "@/global/styles/componentStyles";
+import { CardItem } from "@/components/CardItem";
 
 export default function Home() {
+  const { user, elements, sortBy } = useStore();
+  const router = useRouter();
+
+  const handleAddTodo = () => {
+    router.push("/add");
+  };
+
+  const sortedElements = useMemo(() => {
+    switch (sortBy) {
+      case "name":
+        return [...elements].sort((a, b) => a.title.localeCompare(b.title));
+      case "priority":
+        return [...elements].sort((a, b) => b.severity - a.severity);
+      case "completed":
+        return [...elements].sort((a, b) => a.completed - b.completed);
+      default:
+        return elements;
+    }
+  }, [elements, sortBy]);
+
+  // useEffect(() => {
+  //   if (!user) {
+  //     router.push("/login");
+  //   }
+  // }, [user, router]);
+
+  // if (!user) {
+  //   return null;
+  // }
+
+  if (sortedElements.length === 0) {
+    return (
+      <VStack p={4} spacing={4} justify="center" align="center" height="100%">
+        <Text>No tasks found.</Text>
+        <Text>Start by adding a new task.</Text>
+        <Button
+          onClick={handleAddTodo}
+          size="sm"
+          mr={4}
+          flexShrink={0}
+          sx={{
+            background: "linear-gradient(90deg, #5e1e96, #f41e04)",
+            backgroundSize: "200% 200%",
+            transition: "background-position 0.5s ease",
+            _hover: {
+              backgroundPosition: "100% 50%",
+            },
+          }}
+          css={gradientAnimation}
+        >
+          Add Todo
+        </Button>
+      </VStack>
+    );
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <SimpleGrid
+      minChildWidth="300px"
+      spacing="40px"
+      p={4}
+      overflowY="scroll"
+      height="100%"
+    >
+      {sortedElements.map((element) => (
+        <CardItem
+          key={element.id}
+          p={4}
+          borderWidth="1px"
+          borderRadius="md"
+          {...element}
         />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      ))}
+    </SimpleGrid>
   );
 }
