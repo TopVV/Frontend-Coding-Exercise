@@ -11,10 +11,13 @@ import {
   Textarea,
   FormErrorMessage,
   Box,
+  HStack,
 } from "@chakra-ui/react";
 import { useStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { glassEffectStyles } from "@/global/styles/componentStyles";
+import { useCallback } from "react";
+import { APP_ROUTES } from "@/global/const/routes";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -24,7 +27,7 @@ const schema = z.object({
   }),
 });
 
-const AddForm = () => {
+export const AddForm = () => {
   const { addElement } = useStore();
   const router = useRouter();
   const {
@@ -35,16 +38,23 @@ const AddForm = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    addElement({
-      id: Date.now(),
-      title: data.title,
-      description: data.description,
-      completed: false,
-      severity: parseInt(data.severity, 10), // Перетворення стрічкового значення на число
-    });
-    router.push("/");
-  };
+  const onSubmit = useCallback(
+    (data) => {
+      addElement({
+        id: Date.now(),
+        title: data.title,
+        description: data.description,
+        completed: false,
+        severity: parseInt(data.severity, 10),
+      });
+      router.push(APP_ROUTES.HOME);
+    },
+    [addElement, router],
+  );
+
+  const handleCancel = useCallback(() => {
+    router.push(APP_ROUTES.HOME);
+  }, [router]);
 
   return (
     <Box
@@ -66,6 +76,7 @@ const AddForm = () => {
             <Textarea
               id="description"
               placeholder="Description"
+              maxHeight="200px"
               {...register("description")}
             />
             <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
@@ -85,11 +96,14 @@ const AddForm = () => {
             <FormErrorMessage>{errors.severity?.message}</FormErrorMessage>
           </FormControl>
 
-          <Button type="submit">Add Task</Button>
+          <HStack justifyContent="space-between">
+            <Button type="button" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button type="submit">Add Task</Button>
+          </HStack>
         </VStack>
       </form>
     </Box>
   );
 };
-
-export default AddForm;

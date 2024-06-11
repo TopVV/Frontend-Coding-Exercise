@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { defaultTodos } from "../../mocks/data/defaultTodos";
 
 const useStore = create((set) => ({
@@ -6,7 +6,7 @@ const useStore = create((set) => ({
   login: (username) =>
     set({ user: username, elements: defaultTodos[username] }),
   logout: () => set({ user: null }),
-  elements: defaultTodos.user1,
+  elements: [],
   addElement: (element) =>
     set((state) => ({
       elements: [...state.elements, element],
@@ -26,8 +26,24 @@ const useStore = create((set) => ({
     set((state) => ({
       elements: state.elements.filter((element) => element.id !== id),
     })),
-  sortBy: "default",
-  setSortBy: (sortBy) => set({ sortBy }),
+  viewSettings: {
+    sortBy: "default",
+    hideCompleted: true,
+  },
+  setSortBy: (sortBy) =>
+    set((state) => ({
+      viewSettings: {
+        ...state.viewSettings,
+        sortBy,
+      },
+    })),
+  toggleHideCompleted: () =>
+    set((state) => ({
+      viewSettings: {
+        ...state.viewSettings,
+        hideCompleted: !state.viewSettings.hideCompleted,
+      },
+    })),
 }));
 
 export { useStore };

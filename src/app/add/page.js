@@ -1,28 +1,14 @@
 "use client";
 
-import { Box, Center, VStack } from "@chakra-ui/react";
-import AddForm from "../../components/AddForm";
-import { useStore } from "@/store";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Center } from "@chakra-ui/react";
+import { AddForm } from "@/components/AddForm/AddForm";
 
-export default function AddPage() {
-  const { user } = useStore();
-  const router = useRouter();
-
-  // useEffect(() => {
-  //   if (!user) {
-  //     router.push("/login");
-  //   }
-  // }, [user, router]);
-  //
-  // if (!user) {
-  //   return null;
-  // }
-
+const AddPage = () => {
   return (
     <Center height="100%">
       <AddForm />
     </Center>
   );
-}
+};
+
+export default AddPage;

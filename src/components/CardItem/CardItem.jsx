@@ -4,10 +4,8 @@ import {
   ChevronUpIcon,
   DeleteIcon,
   CheckIcon,
-  CloseIcon,
 } from "@chakra-ui/icons";
 import {
-  Box,
   Card,
   CardHeader,
   Heading,
@@ -17,11 +15,13 @@ import {
   IconButton,
   Text,
 } from "@chakra-ui/react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useStore } from "@/store";
+import { clampTextStyles } from "@/global/styles/componentStyles";
 
 export const CardItem = ({ title, severity, id, description, completed }) => {
   const { toggleCompleted, deleteElement } = useStore();
+
   const severityIndicator = useMemo(() => {
     switch (severity) {
       case 0:
@@ -48,76 +48,58 @@ export const CardItem = ({ title, severity, id, description, completed }) => {
     }
   }, [severity]);
 
-  const handleToggleComplete = () => {
+  const handleToggleComplete = useCallback(() => {
     toggleCompleted(id);
-  };
+  }, [id, toggleCompleted]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     deleteElement(id);
-  };
+  }, [id, deleteElement]);
+
+  const sharedTextStyles = useMemo(
+    () => ({
+      textDecoration: completed ? "line-through" : "none",
+      ...clampTextStyles,
+    }),
+    [completed],
+  );
 
   return (
     <Center>
       <Card
-        borderRadius={16}
-        background="linear-gradient(147deg, #FFE53B 0%, #fd3838 74%)"
         width="300px"
         height="250px"
+        borderRadius={16}
+        background="linear-gradient(147deg, #FFE53B 0%, #fd3838 74%)"
         transition="transform 0.3s, box-shadow 0.3s"
         _hover={{
           transform: "scale(1.05)",
           boxShadow: "0 8px 30px rgba(0, 0, 0, 0.2)",
         }}
       >
-        <CardHeader
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Heading
-            size="md"
-            sx={{
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textDecoration: completed ? "line-through" : "none",
-            }}
-          >
+        <CardHeader display="flex" justifyContent="space-between">
+          <Heading size="md" sx={sharedTextStyles}>
             {title}
           </Heading>
           <Center
-            borderRadius="50%"
             width={5}
             height={5}
-            backgroundColor={severityIndicator.color}
             flexShrink={0}
+            borderRadius="50%"
+            backgroundColor={severityIndicator.color}
           >
             {severityIndicator.icon}
           </Center>
         </CardHeader>
         <CardBody>
-          <Text
-            sx={{
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textDecoration: completed ? "line-through" : "none",
-            }}
-          >
-            {description}
-          </Text>
+          <Text sx={sharedTextStyles}>{description}</Text>
         </CardBody>
         <CardFooter
+          display="flex"
           alignSelf="end"
+          justifyContent="space-between"
           width="100%"
           pt={0}
-          display="flex"
-          justifyContent="space-between"
         >
           <IconButton
             onClick={handleToggleComplete}
@@ -133,8 +115,13 @@ export const CardItem = ({ title, severity, id, description, completed }) => {
                     backgroundColor: "green.500",
                   }
             }
+            aria-label="mark as completed"
           />
-          <IconButton icon={<DeleteIcon />} onClick={handleDelete} />
+          <IconButton
+            icon={<DeleteIcon />}
+            onClick={handleDelete}
+            aria-label="delete"
+          />
         </CardFooter>
       </Card>
     </Center>

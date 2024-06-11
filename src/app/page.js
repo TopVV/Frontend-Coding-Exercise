@@ -1,64 +1,54 @@
 "use client";
 
-import {
-  Box,
-  Flex,
-  SimpleGrid,
-  HStack,
-  VStack,
-  Text,
-  Button,
-} from "@chakra-ui/react";
+import { SimpleGrid, Text, Button, Center } from "@chakra-ui/react";
 import { useStore } from "@/store";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
-import {
-  glassEffectStyles,
-  gradientAnimation,
-} from "@/global/styles/componentStyles";
-import { CardItem } from "@/components/CardItem";
+import { useCallback, useMemo } from "react";
+import { gradientAnimation } from "@/global/styles/componentStyles";
+import { CardItem } from "@/components/CardItem/CardItem";
+import { APP_ROUTES } from "@/global/const/routes";
+import { SORT_VARIANTS } from "@/global/const/sortVariants";
 
 export default function Home() {
-  const { user, elements, sortBy } = useStore();
+  const { elements, viewSettings } = useStore();
+  const { sortBy, hideCompleted } = viewSettings;
   const router = useRouter();
 
-  const handleAddTodo = () => {
-    router.push("/add");
-  };
+  const handleAddTodo = useCallback(() => {
+    router.push(APP_ROUTES.ADD);
+  }, [router]);
 
-  const sortedElements = useMemo(() => {
-    switch (sortBy) {
-      case "name":
-        return [...elements].sort((a, b) => a.title.localeCompare(b.title));
-      case "priority":
-        return [...elements].sort((a, b) => b.severity - a.severity);
-      case "completed":
-        return [...elements].sort((a, b) => a.completed - b.completed);
-      default:
-        return elements;
+  const elementsWithAppliedSettings = useMemo(() => {
+    let updatedElements = elements;
+
+    if (hideCompleted) {
+      updatedElements = updatedElements.filter((element) => !element.completed);
     }
-  }, [elements, sortBy]);
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     router.push("/login");
-  //   }
-  // }, [user, router]);
+    switch (sortBy) {
+      case SORT_VARIANTS.NAME:
+        updatedElements = [...updatedElements].sort((a, b) =>
+          a.title.localeCompare(b.title),
+        );
+        break;
+      case SORT_VARIANTS.PRIORITY:
+        updatedElements = [...updatedElements].sort(
+          (a, b) => b.severity - a.severity,
+        );
+        break;
+    }
 
-  // if (!user) {
-  //   return null;
-  // }
+    return updatedElements;
+  }, [elements, sortBy, hideCompleted]);
 
-  if (sortedElements.length === 0) {
+  if (elementsWithAppliedSettings.length === 0) {
     return (
-      <VStack p={4} spacing={4} justify="center" align="center" height="100%">
+      <Center flexDirection="column" p={4} gap={4} height="100%">
         <Text>No tasks found.</Text>
         <Text>Start by adding a new task.</Text>
         <Button
           onClick={handleAddTodo}
           size="sm"
-          mr={4}
-          flexShrink={0}
           sx={{
             background: "linear-gradient(90deg, #5e1e96, #f41e04)",
             backgroundSize: "200% 200%",
@@ -71,7 +61,7 @@ export default function Home() {
         >
           Add Todo
         </Button>
-      </VStack>
+      </Center>
     );
   }
 
@@ -83,14 +73,8 @@ export default function Home() {
       overflowY="scroll"
       height="100%"
     >
-      {sortedElements.map((element) => (
-        <CardItem
-          key={element.id}
-          p={4}
-          borderWidth="1px"
-          borderRadius="md"
-          {...element}
-        />
+      {elementsWithAppliedSettings.map((element) => (
+        <CardItem key={element.id} {...element} />
       ))}
     </SimpleGrid>
   );

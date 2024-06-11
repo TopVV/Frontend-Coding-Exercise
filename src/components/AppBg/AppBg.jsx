@@ -1,10 +1,11 @@
 "use client";
 
-import { Box, Center, Text, VStack } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Header } from "@/components/Header/Header";
+import { Footer } from "@/components/Footer/Footer";
+import { APP_ROUTES } from "@/global/const/routes";
 
 const sharedCirclesStyles = {
   borderRadius: "50%",
@@ -23,26 +24,13 @@ const sharedSmallCirclesStyles = {
   height: "30px",
 };
 
-const FOOTER_HEIGHT = 100;
-
 export const AppBg = ({ children }) => {
-  // get current rout and check if it's login
-
   const pathname = usePathname();
-  const isLogin = pathname === "/login";
-
-  console.log("router", pathname);
+  const isLogin = pathname === APP_ROUTES.LOGIN;
 
   const loginBg = useMemo(
     () => (
-      <Box
-        sx={{
-          width: "700px",
-          height: "80%",
-          margin: "0 auto",
-          position: "relative",
-        }}
-      >
+      <Box width="700px" height="80%" mx="auto" position="relative">
         <Box
           sx={{
             ...sharedBigCirclesStyles,
@@ -81,13 +69,24 @@ export const AppBg = ({ children }) => {
     [children],
   );
 
+  const appContent = useMemo(
+    () =>
+      isLogin ? (
+        loginBg
+      ) : (
+        <Box width="100%" height="100%">
+          {children}
+        </Box>
+      ),
+    [children, isLogin, loginBg],
+  );
+
   return (
     <>
-      <Box as="header">
-        <Header />
-      </Box>
+      <Header />
       <Box
         width="100%"
+        // 56px - header height, 56px - footer height
         height={`calc(100vh - ${56 + 56}px)`}
         display="flex"
         justifyContent="center"
@@ -98,30 +97,9 @@ export const AppBg = ({ children }) => {
             : "linear-gradient(45deg, #553C9A, #322659)",
         }}
       >
-        {isLogin ? (
-          loginBg
-        ) : (
-          <Box width="100%" height="100%">
-            {children}
-          </Box>
-        )}
+        {appContent}
       </Box>
       <Footer />
-      {/*<Center*/}
-      {/*  as="footer"*/}
-      {/*  position="absolute"*/}
-      {/*  left={0}*/}
-      {/*  right={0}*/}
-      {/*  bottom={0}*/}
-      {/*  height={`${FOOTER_HEIGHT}px`}*/}
-      {/*  backgroundColor="#662397"*/}
-      {/*  borderTopRadius={16}*/}
-      {/*>*/}
-      {/*  <VStack>*/}
-      {/*    <Text>Test Exercise App For Digis</Text>*/}
-      {/*    <Text>Vadym Topchieiev</Text>*/}
-      {/*  </VStack>*/}
-      {/*</Center>*/}
     </>
   );
 };
