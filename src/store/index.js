@@ -1,49 +1,10 @@
 import { create } from "zustand";
-import { defaultTodos } from "../../mocks/data/defaultTodos";
+import { createElementsSlice } from "@/store/elementsSlice";
+import { createLoginSlice } from "@/store/loginSlice";
+import { createViewSettingsSlice } from "@/store/viewSettingsSlice";
 
-const useStore = create((set) => ({
-  user: null,
-  login: (username) =>
-    set({ user: username, elements: defaultTodos[username] }),
-  logout: () => set({ user: null }),
-  elements: [],
-  addElement: (element) =>
-    set((state) => ({
-      elements: [...state.elements, element],
-    })),
-  toggleCompleted: (id) =>
-    set((state) => ({
-      elements: state.elements.map((element) =>
-        element.id === id
-          ? {
-              ...element,
-              completed: !element.completed,
-            }
-          : element,
-      ),
-    })),
-  deleteElement: (id) =>
-    set((state) => ({
-      elements: state.elements.filter((element) => element.id !== id),
-    })),
-  viewSettings: {
-    sortBy: "default",
-    hideCompleted: true,
-  },
-  setSortBy: (sortBy) =>
-    set((state) => ({
-      viewSettings: {
-        ...state.viewSettings,
-        sortBy,
-      },
-    })),
-  toggleHideCompleted: () =>
-    set((state) => ({
-      viewSettings: {
-        ...state.viewSettings,
-        hideCompleted: !state.viewSettings.hideCompleted,
-      },
-    })),
+export const useBoundStore = create((...a) => ({
+  ...createElementsSlice(...a),
+  ...createLoginSlice(...a),
+  ...createViewSettingsSlice(...a),
 }));
-
-export { useStore };

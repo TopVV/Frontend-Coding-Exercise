@@ -13,22 +13,22 @@ import {
   Box,
   HStack,
 } from "@chakra-ui/react";
-import { useStore } from "@/store";
+import { useBoundStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { glassEffectStyles } from "@/global/styles/componentStyles";
-import { useCallback } from "react";
 import { APP_ROUTES } from "@/global/const/routes";
+import { SEVERITY_LEVELS } from "@/global/const/severity";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  severity: z.enum(["0", "1", "2"], {
+  severity: z.enum(Object.keys(SEVERITY_LEVELS), {
     errorMap: () => ({ message: "Severity is required" }),
   }),
 });
 
 export const AddForm = () => {
-  const { addElement } = useStore();
+  const { addElement } = useBoundStore();
   const router = useRouter();
   const {
     register,
@@ -38,23 +38,20 @@ export const AddForm = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = useCallback(
-    (data) => {
-      addElement({
-        id: Date.now(),
-        title: data.title,
-        description: data.description,
-        completed: false,
-        severity: parseInt(data.severity, 10),
-      });
-      router.push(APP_ROUTES.HOME);
-    },
-    [addElement, router],
-  );
-
-  const handleCancel = useCallback(() => {
+  const onSubmit = (data) => {
+    addElement({
+      id: Date.now(),
+      title: data.title,
+      description: data.description,
+      completed: false,
+      severity: SEVERITY_LEVELS[data.severity].value,
+    });
     router.push(APP_ROUTES.HOME);
-  }, [router]);
+  };
+
+  const handleCancel = () => {
+    router.push(APP_ROUTES.HOME);
+  };
 
   return (
     <Box
@@ -89,9 +86,11 @@ export const AddForm = () => {
               placeholder="Select severity"
               {...register("severity")}
             >
-              <option value="0">Low</option>
-              <option value="1">Medium</option>
-              <option value="2">High</option>
+              {Object.entries(SEVERITY_LEVELS).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.text}
+                </option>
+              ))}
             </Select>
             <FormErrorMessage>{errors.severity?.message}</FormErrorMessage>
           </FormControl>

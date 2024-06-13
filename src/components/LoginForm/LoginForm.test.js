@@ -1,7 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { useForm } from "react-hook-form";
-import { useStore } from "@/store";
+import { useBoundStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { LoginForm } from "./LoginForm";
 import { APP_ROUTES } from "@/global/const/routes";
@@ -11,7 +10,7 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 jest.mock("@/store", () => ({
-  useStore: jest.fn(),
+  useBoundStore: jest.fn(),
 }));
 
 describe("LoginForm", () => {
@@ -22,7 +21,7 @@ describe("LoginForm", () => {
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
     }));
-    useStore.mockImplementation(() => ({
+    useBoundStore.mockImplementation(() => ({
       login: mockLogin,
     }));
   });

@@ -1,22 +1,15 @@
 "use client";
 
-import { SimpleGrid, Text, Button, Center } from "@chakra-ui/react";
-import { useStore } from "@/store";
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
-import { gradientAnimation } from "@/global/styles/componentStyles";
+import { useMemo } from "react";
+import { SimpleGrid } from "@chakra-ui/react";
+import { useBoundStore } from "@/store";
 import { CardItem } from "@/components/CardItem/CardItem";
-import { APP_ROUTES } from "@/global/const/routes";
 import { SORT_VARIANTS } from "@/global/const/sortVariants";
+import { NoElementsPlaceholder } from "@/components/NoElementsPlaceholder/NoElementsPlaceholder";
 
 export default function Home() {
-  const { elements, viewSettings } = useStore();
+  const { elements, viewSettings } = useBoundStore();
   const { sortBy, hideCompleted } = viewSettings;
-  const router = useRouter();
-
-  const handleAddTodo = useCallback(() => {
-    router.push(APP_ROUTES.ADD);
-  }, [router]);
 
   const elementsWithAppliedSettings = useMemo(() => {
     let updatedElements = elements;
@@ -42,27 +35,7 @@ export default function Home() {
   }, [elements, sortBy, hideCompleted]);
 
   if (elementsWithAppliedSettings.length === 0) {
-    return (
-      <Center flexDirection="column" p={4} gap={4} height="100%">
-        <Text>No tasks found.</Text>
-        <Text>Start by adding a new task.</Text>
-        <Button
-          onClick={handleAddTodo}
-          size="sm"
-          sx={{
-            background: "linear-gradient(90deg, #5e1e96, #f41e04)",
-            backgroundSize: "200% 200%",
-            transition: "background-position 0.5s ease",
-            _hover: {
-              backgroundPosition: "100% 50%",
-            },
-          }}
-          css={gradientAnimation}
-        >
-          Add Todo
-        </Button>
-      </Center>
-    );
+    return <NoElementsPlaceholder />;
   }
 
   return (

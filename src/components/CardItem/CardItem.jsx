@@ -1,10 +1,4 @@
-import {
-  MinusIcon,
-  DeleteIcon,
-  CheckIcon,
-  TriangleDownIcon,
-  TriangleUpIcon,
-} from "@chakra-ui/icons";
+import { DeleteIcon, CheckIcon } from "@chakra-ui/icons";
 import {
   Card,
   CardHeader,
@@ -15,39 +9,25 @@ import {
   IconButton,
   Text,
 } from "@chakra-ui/react";
-import { useCallback, useMemo } from "react";
-import { useStore } from "@/store";
+import { useBoundStore } from "@/store";
 import { clampTextStyles } from "@/global/styles/componentStyles";
+import { SeverityIndicator } from "@/components/SeverityIndicator/SeverityIndicator";
 
 export const CardItem = ({ title, severity, id, description, completed }) => {
-  const { toggleCompleted, deleteElement } = useStore();
+  const { toggleCompleted, deleteElement } = useBoundStore();
 
-  const severityIndicator = useMemo(() => {
-    switch (severity) {
-      case 0:
-        return <TriangleDownIcon boxSize="14px" />;
-      case 1:
-        return <MinusIcon boxSize="14px" />;
-      case 2:
-        return <TriangleUpIcon boxSize="14px" />;
-    }
-  }, [severity]);
-
-  const handleToggleComplete = useCallback(() => {
+  const handleToggleComplete = () => {
     toggleCompleted(id);
-  }, [id, toggleCompleted]);
+  };
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = () => {
     deleteElement(id);
-  }, [id, deleteElement]);
+  };
 
-  const sharedTextStyles = useMemo(
-    () => ({
-      textDecoration: completed ? "line-through" : "none",
-      ...clampTextStyles,
-    }),
-    [completed],
-  );
+  const sharedTextStyles = {
+    textDecoration: completed ? "line-through" : "none",
+    ...clampTextStyles,
+  };
 
   return (
     <Center>
@@ -70,7 +50,7 @@ export const CardItem = ({ title, severity, id, description, completed }) => {
           >
             {title}
           </Heading>
-          {severityIndicator}
+          <SeverityIndicator severity={severity} />
         </CardHeader>
         <CardBody>
           <Text sx={sharedTextStyles} data-testid="card-item-description">
@@ -105,6 +85,7 @@ export const CardItem = ({ title, severity, id, description, completed }) => {
             icon={<DeleteIcon />}
             onClick={handleDelete}
             aria-label="delete"
+            data-testid="deleteButton"
           />
         </CardFooter>
       </Card>

@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useStore } from "@/store";
-import { Center, Spinner, Text } from "@chakra-ui/react";
+import { useBoundStore } from "@/store";
+import { Center, Spinner, Text, VStack } from "@chakra-ui/react";
 import { APP_ROUTES } from "@/global/const/routes";
 
 const Layout = ({ children }) => {
-  const { user } = useStore();
+  const { user } = useBoundStore();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -19,11 +19,13 @@ const Layout = ({ children }) => {
 
   if (!user && pathname !== APP_ROUTES.LOGIN) {
     return (
-      <Center height="100vh">
-        <Text mr={4}>
-          Please log in to access this page. Redirecting to login...
-        </Text>
-        <Spinner size="xl" />
+      <Center height="100%">
+        <VStack>
+          <Text mr={4} textAlign="center">
+            Please log in to access this page. Redirecting to login...
+          </Text>
+          <Spinner size="xl" />
+        </VStack>
       </Center>
     );
   }

@@ -6,7 +6,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { gradientAnimation } from "@/global/styles/componentStyles";
-import { useStore } from "@/store";
+import { useBoundStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +26,7 @@ const schema = z.object({
 });
 
 export const LoginForm = () => {
-  const { login } = useStore();
+  const { login } = useBoundStore();
   const router = useRouter();
   const {
     register,

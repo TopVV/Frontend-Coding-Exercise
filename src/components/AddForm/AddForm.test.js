@@ -1,14 +1,15 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { useStore } from "@/store";
+import { useBoundStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { AddForm } from "./AddForm";
 import { APP_ROUTES } from "@/global/const/routes";
+import { SEVERITY_LEVELS } from "@/global/const/severity";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 jest.mock("@/store", () => ({
-  useStore: jest.fn(),
+  useBoundStore: jest.fn(),
 }));
 
 describe("AddForm", () => {
@@ -19,7 +20,7 @@ describe("AddForm", () => {
     useRouter.mockImplementation(() => ({
       push: mockRouterPush,
     }));
-    useStore.mockImplementation(() => ({
+    useBoundStore.mockImplementation(() => ({
       addElement: mockAddElement,
     }));
   });
@@ -50,26 +51,30 @@ describe("AddForm", () => {
 
   test("calls addElement and redirects on valid form submission", async () => {
     render(<AddForm />);
+    const severityKey = Object.keys(SEVERITY_LEVELS)[0];
+    const newElement = {
+      title: "Test Title",
+      description: "Test Description",
+      completed: false,
+      severity: SEVERITY_LEVELS[severityKey].value,
+    };
 
     fireEvent.input(screen.getByLabelText(/Title/i), {
-      target: { value: "Test Title" },
+      target: { value: newElement.title },
     });
     fireEvent.input(screen.getByLabelText(/Description/i), {
-      target: { value: "Test Description" },
+      target: { value: newElement.description },
     });
     fireEvent.change(screen.getByLabelText(/Severity/i), {
-      target: { value: "1" },
+      target: { value: severityKey },
     });
 
     fireEvent.click(screen.getByText(/Add Task/i));
 
     await waitFor(() => {
       expect(mockAddElement).toHaveBeenCalledWith({
+        ...newElement,
         id: expect.any(Number),
-        title: "Test Title",
-        description: "Test Description",
-        completed: false,
-        severity: 1,
       });
       expect(mockRouterPush).toHaveBeenCalledWith(APP_ROUTES.HOME);
     });
